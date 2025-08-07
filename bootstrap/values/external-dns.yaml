@@ -1,0 +1,70 @@
+---
+provider:
+    name: webhook
+    webhook:
+        image:
+            repository: ghcr.io/mirceanton/external-dns-provider-mikrotik
+            tag: v1.0.0
+        env:
+            - name: SERVER_HOST
+              value: "0.0.0.0"
+            - name: MIKROTIK_BASEURL
+              valueFrom:
+                  secretKeyRef:
+                      name: mikrotik-credentials
+                      key: MIKROTIK_BASEURL
+            - name: MIKROTIK_USERNAME
+              valueFrom:
+                  secretKeyRef:
+                      name: mikrotik-credentials
+                      key: MIKROTIK_USERNAME
+            - name: MIKROTIK_PASSWORD
+              valueFrom:
+                  secretKeyRef:
+                      name: mikrotik-credentials
+                      key: MIKROTIK_PASSWORD
+            - name: MIKROTIK_SKIP_TLS_VERIFY
+              valueFrom:
+                  secretKeyRef:
+                      name: mikrotik-credentials
+                      key: MIKROTIK_SKIP_TLS_VERIFY
+            - name: LOG_LEVEL
+              value: info
+            - name: MIKROTIK_DEFAULT_TTL
+              value: "3600"
+        livenessProbe:
+            httpGet:
+                path: /health
+                port: 8888
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+        readinessProbe:
+            httpGet:
+                path: /health
+                port: 8888
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+
+extraArgs:
+    - --webhook-provider-url=http://localhost:8888
+
+sources:
+    - ingress
+    - service
+    - crd
+
+domainFilters:
+    - k8s.home.lab
+
+policy: sync
+
+logLevel: info
+
+txtOwnerId: external-dns
+
+txtPrefix: k8s-
+
+managedRecordTypes:
+    - A
+    - AAAA
+    - CNAME

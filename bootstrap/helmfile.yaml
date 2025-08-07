@@ -1,0 +1,55 @@
+helmDefaults:
+    cleanupOnFail: true
+    wait: true
+    waitForJobs: true
+
+repositories:
+    - name: cilium
+      url: https://helm.cilium.io/
+    - name: external-secrets
+      url: https://charts.external-secrets.io
+    - name: external-dns
+      url: https://kubernetes-sigs.github.io/external-dns/
+    - name: csi-driver-nfs
+      url: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
+
+hooks:
+    - events: ["presync"]
+      command: "kubectl"
+      args: ["apply", "-f", "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml"]
+
+releases:
+    - name: cilium
+      namespace: kube-system
+      chart: cilium/cilium
+      version: "v1.17.2"
+      values: [values/cilium.yaml]
+
+    - name: external-secrets
+      namespace: external-secrets
+      chart: external-secrets/external-secrets
+      version: "0.17.0"
+      createNamespace: true
+      needs: ['kube-system/cilium']
+      values: [values/external-secrets.yaml]
+
+    - name: csi-driver-nfs
+      namespace: kube-system-nfs-csi
+      chart: csi-driver-nfs/csi-driver-nfs
+      version: "v4.9.0"
+      createNamespace: true
+      needs: ['kube-system/cilium']
+      values: [values/nfs-csi.yaml]
+
+    - name: external-dns-mikrotik
+      namespace: external-dns
+      chart: external-dns/external-dns
+      version: "1.18.0"
+      createNamespace: true
+      needs: ['external-secrets/external-secrets']
+      values: [values/external-dns.yaml]
+
+hooks:
+  - events: ["postsync"]
+    command: "kubectl"
+    args: ["apply", "-f", "../cluster/apps/external-dns/mikrotik-secret.yaml"]

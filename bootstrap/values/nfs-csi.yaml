@@ -1,0 +1,12 @@
+---
+controller:
+    replicas: 1
+
+node: {}
+
+rbac:
+    create: true
+
+storageClasses:
+    - name: nfs-csi
+      create: false 
