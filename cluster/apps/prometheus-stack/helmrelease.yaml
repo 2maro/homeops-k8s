@@ -1,0 +1,98 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: flux-system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: "61.3.1"
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+  targetNamespace: monitoring
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      remediateLastFailure: true
+
+  values:
+
+    grafana:
+      enabled: true
+      persistence:
+        enabled: true
+        type: pvc
+        storageClassName: nfs-csi
+        accessModes: ["ReadWriteMany"]
+        size: 5Gi
+      sidecar:
+        datasources:
+          enabled: true
+          defaultDatasource: Prometheus
+
+    # --- Prometheus Configuration ---
+    prometheus:
+      enabled: true
+      prometheusSpec:
+
+        serviceMonitorSelectorNilUsesHelmValues: false
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: nfs-csi
+              accessModes: ["ReadWriteMany"]
+              resources:
+                requests:
+                  storage: 20Gi
+        retention: 15d
+        retentionSize: "18Gi"
+        # additionalScrapeConfigs: []
+
+    # --- Alertmanager Configuration ---
+    alertmanager:
+      enabled: true
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: nfs-csi
+              accessModes: ["ReadWriteMany"]
+              resources:
+                requests:
+                  storage: 5Gi
+      # This is a placeholder config. You will customize 'receivers' later.
+      config:
+        global:
+          resolve_timeout: 5m
+        route:
+          group_by: ['job']
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 12h
+          receiver: 'null'
+        receivers:
+        - name: 'null'
+
+    # --- Node Exporter Configuration ---
+    node-exporter:
+      prometheus:
+        monitor:
+          relabelings:
+          - action: drop
+            regex: container_cpu_cfs_throttled_seconds_total
+            sourceLabels:
+            - __name__
+
+    # --- Kube State Metrics Configuration ---
+    kube-state-metrics:
+      metricLabelsAllowlist:
+      - "pods=[*]"
+      - "deployments=[*]"
+      - "persistentvolumeclaims=[*]"
