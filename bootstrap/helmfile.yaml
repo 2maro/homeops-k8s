@@ -19,12 +19,6 @@ hooks:
     - events: ["presync"]
       command: "kubectl"
       args: ["apply", "-f", "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml"]
-    - events: ["postsync"]
-      command: "kubectl"
-      args: ["apply", "-f", "cluster-secret-store.yaml"]
-    - events: ["postsync"]
-      command: "kubectl"
-      args: ["apply", "-f", "../cluster/apps/external-dns/mikrotik-secret.yaml"]
 
 releases:
     - name: cilium
@@ -40,6 +34,13 @@ releases:
       createNamespace: true
       needs: ['kube-system/cilium']
       values: [values/external-secrets.yaml]
+      hooks:
+        - events: ["postsync"]
+          command: "kubectl"
+          args: ["apply", "-f", "values/cluster-secret-store.yaml"]
+        - events: ["postsync"]
+          command: "kubectl"
+          args: ["apply", "-f", "../cluster/apps/external-dns/mikrotik-secret.yaml"]
 
     - name: csi-driver-nfs
       namespace: kube-system-nfs-csi
