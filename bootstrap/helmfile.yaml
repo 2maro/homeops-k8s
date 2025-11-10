@@ -1,0 +1,41 @@
+---
+helmDefaults:
+  wait: true
+
+repositories:
+  - name: cilium
+    url: https://helm.cilium.io
+
+releases:
+  - name: cilium
+    namespace: cilium
+    installed: true
+    chart: cilium/cilium
+    version: 1.16.3
+    createNamespace: true
+    values:
+      - values/cilium.yaml
+    wait: true
+    timeout: 600
+
+    hooks:
+      - events: ["postSync"]
+        showlogs: true
+        command: kubectl
+        args:
+          - apply
+          - -f
+          - values/cilium-lb-ippool.yaml
+
+  - name: flux-operator
+    namespace: flux-system
+    installed: true
+    chart: oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator
+    version: 0.33.0
+    createNamespace: true
+    needs:
+      - cilium/cilium
+    values:
+      - values/flux-operator.yaml
+    wait: true
+    timeout: 300
