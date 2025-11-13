@@ -17,9 +17,15 @@ releases:
       - values/cilium.yaml
     wait: true
     timeout: 600
-
     hooks:
-      - events: ["postSync"]
+      - events: ["presync"]
+        showlogs: true
+        command: kubectl
+        args:
+          - apply
+          - -f
+          - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+      - events: ["postsync"]
         showlogs: true
         command: kubectl
         args:
