@@ -4,4 +4,4 @@ resources:
     - namespace.yaml
     - rbac.yaml
     - helmrelease.yaml
-    - config
+    - clustersecretstore.yaml

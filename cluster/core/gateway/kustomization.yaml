@@ -5,4 +5,5 @@ resources:
     - namespace.yaml
     - gatewayclass.yaml
     - gateway.yaml
+    - wildcard-cert.yaml
 
