@@ -1,6 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+metadata:
+  name: cert-manager-config
 namespace: cert-manager
 resources:
   - clusterissuer.yaml
-  - wildcard-certificate.yaml
+  - wildcard-cert.yaml
+
