@@ -1,0 +1,70 @@
+---
+helmDefaults:
+    wait: true
+
+repositories:
+    - name: cilium
+      url: https://helm.cilium.io
+    - name: jetstack
+      url: https://charts.jetstack.io
+    - name: external-secrets
+      url: https://charts.external-secrets.io
+
+releases:
+    - name: cilium
+      namespace: cilium
+      installed: true
+      chart: cilium/cilium
+      version: 1.16.3
+      createNamespace: true
+      values:
+          - values/cilium.yaml
+      wait: true
+      timeout: 600
+      hooks:
+          - events: ["presync"]
+            showlogs: true
+            command: kubectl
+            args:
+                - apply
+                - -f
+                - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
+          - events: ["presync"]
+            showlogs: true
+            command: kubectl
+            args:
+                - apply
+                - -f
+                - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/experimental-install.yaml
+          - events: ["postsync"]
+            showlogs: true
+            command: kubectl
+            args:
+                - apply
+                - -f
+                - values/cilium-lb-ippool.yaml
+
+    - name: cert-manager
+      namespace: cert-manager
+      installed: true
+      chart: jetstack/cert-manager
+      version: 1.14.5
+      createNamespace: true
+      wait: true
+      timeout: 600
+      set:
+          - name: installCRDs
+            value: true
+      needs:
+          - cilium/cilium
+
+    - name: external-secrets
+      namespace: external-secrets
+      installed: true
+      chart: external-secrets/external-secrets
+      version: 0.9.9
+      createNamespace: true
+      wait: true
+      timeout: 600
+      needs:
+          - cert-manager/cert-manager
