@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+    name: vault-issuer
+spec:
+    vault:
+        server: http://192.168.1.48:8200
+        path: pki_int/issue/k8s-cluster-role
+        auth:
+            kubernetes:
+                mountPath: /v1/auth/kubernetes
+                role: cert-manager-role
+                secretRef:
+                    name: cert-manager-vault-token
+                    key: token
