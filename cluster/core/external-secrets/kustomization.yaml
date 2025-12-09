@@ -5,4 +5,3 @@ resources:
   - namespace.yaml
   - helmrelease.yaml
   - helmrepository.yaml
-  - rbac-auth-delegator.yaml
