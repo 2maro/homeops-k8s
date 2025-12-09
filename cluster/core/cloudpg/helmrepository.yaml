@@ -16,7 +16,7 @@ spec:
   interval: 30m
   chart:
     spec:
-      chart: cloudnativepg
+      chart: cloudnative-pg
       version: "0.21.3"
       sourceRef:
         kind: HelmRepository
@@ -26,4 +26,4 @@ spec:
     crds:
       create: true
     monitoring:
-      enabled: false
+      enabled: true
