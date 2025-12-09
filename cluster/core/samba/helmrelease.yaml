@@ -2,7 +2,7 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
     name: csi-driver-smb
-    namespace: flux-system
+    namespace: storage
 spec:
     interval: 24h
     url: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-smb/master/charts
@@ -21,7 +21,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: csi-driver-smb
-        namespace: flux-system
+        namespace: storage
   values:
     rbac:
       create: true
