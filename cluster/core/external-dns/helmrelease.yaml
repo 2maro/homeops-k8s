@@ -33,6 +33,8 @@ spec:
                     repository: ghcr.io/mirceanton/external-dns-provider-mikrotik
                     tag: latest
                 env:
+                    - name: SERVER_HOST
+                      values: "0.0.0.0"
                     - name: MIKROTIK_BASEURL
                       valueFrom:
                           secretKeyRef:
