@@ -15,7 +15,7 @@ spec:
         namespace: flux-system
   values:
     serviceAccount:
-      create: false
+      create: true
       name: external-secrets
     webhook:
       port: 10250
