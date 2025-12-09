@@ -8,3 +8,5 @@ resources:
   - external-dns
   - nfs
   - samba
+  - cloudpg
+  - authentik
