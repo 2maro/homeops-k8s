@@ -1,12 +1,57 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+    name: cloudpg
+    namespace: flux-system
+spec:
+    dependsOn:
+        - name: flux-system
+    path: ./cluster/core/cloudpg
+    prune: true
+    interval: 5m
+    sourceRef:
+        kind: GitRepository
+        name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+    name: cloudpg-config
+    namespace: flux-system
+spec:
+    dependsOn:
+        - name: cloudpg
+    path: ./cluster/core/cloudpg/config
+    prune: true
+    interval: 5m
+    sourceRef:
+        kind: GitRepository
+        name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
     name: cert-manager-config
     namespace: flux-system
 spec:
     dependsOn:
         - name: flux-system
     path: ./cluster/core/cert-manager/config
+    prune: true
+    interval: 5m
+    sourceRef:
+        kind: GitRepository
+        name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+    name: authentik-config
+    namespace: flux-system
+spec:
+    dependsOn:
+        - name: cloudpg
+    path: ./cluster/core/authentik/config
     prune: true
     interval: 5m
     sourceRef:
@@ -31,37 +76,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-    name: samba-config
-    namespace: flux-system
-spec:
-    dependsOn:
-        - name: flux-system
-    path: ./cluster/core/samba/config
-    prune: true
-    interval: 5m
-    sourceRef:
-        kind: GitRepository
-        name: flux-system
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-    name: authentik-config
-    namespace: flux-system
-spec:
-    dependsOn:
-        - name: flux-system
-    path: ./cluster/core/authentik/config
-    prune: true
-    interval: 5m
-    sourceRef:
-        kind: GitRepository
-        name: flux-system
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-    name: external-external-config
+    name: external-secrets-config
     namespace: flux-system
 spec:
     dependsOn:
@@ -73,17 +88,17 @@ spec:
         kind: GitRepository
         name: flux-system
 ---
-  apiVersion: kustomize.toolkit.fluxcd.io/v1
-  kind: Kustomization
-  metadata:
-      name: external-cloudpg-config
-      namespace: flux-system
-  spec:
-      dependsOn:
-          - name: flux-system
-      path: ./cluster/core/cloudpg/config
-      prune: true
-      interval: 5m
-      sourceRef:
-          kind: GitRepository
-          name: flux-system
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+    name: samba-config
+    namespace: flux-system
+spec:
+    dependsOn:
+        - name: flux-system
+    path: ./cluster/core/samba/config
+    prune: true
+    interval: 5m
+    sourceRef:
+        kind: GitRepository
+        name: flux-system
