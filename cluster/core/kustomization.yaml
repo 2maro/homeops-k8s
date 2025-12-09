@@ -7,3 +7,4 @@ resources:
   - external-secrets
   - external-dns
   - nfs
+  - samba

@@ -1,0 +1,20 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: csi-driver-smb
+  namespace: storage
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: csi-driver-smb
+      version: "1.14.0"
+      sourceRef:
+        kind: HelmRepository
+        name: csi-driver-smb
+        namespace: flux-system
+  values:
+    rbac:
+      create: true
+    serviceAccount:
+      create: true
