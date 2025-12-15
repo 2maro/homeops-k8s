@@ -4,7 +4,7 @@ metadata:
   name: smb-csi
 provisioner: smb.csi.k8s.io
 parameters:
-  source: //192.168.1.58/shared
+  source: //192.168.1.118/shared
   csi.storage.k8s.io/node-stage-secret-name: smb-credentials
   csi.storage.k8s.io/node-stage-secret-namespace: storage
 reclaimPolicy: Retain

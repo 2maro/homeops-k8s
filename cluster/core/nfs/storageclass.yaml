@@ -4,7 +4,7 @@ metadata:
   name: nfs-csi
 provisioner: nfs.csi.k8s.io
 parameters:
-  server: 192.168.1.58
+  server: 192.168.1.118
   share: /srv/nfs/k8s
 reclaimPolicy: Retain
 mountOptions:
