@@ -42,6 +42,8 @@ spec:
       enabled: false
     redis:
       enabled: true
+      auth:
+        enabled: false
       master:
         persistence:
           storageClass: nfs-csi
