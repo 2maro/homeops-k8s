@@ -23,14 +23,17 @@ spec:
       enabled: false
     kubeEtcd:
       enabled: false
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+
     prometheus:
       enabled: true
       prometheusSpec:
         serviceMonitorSelectorNilUsesHelmValues: false
         podMonitorSelectorNilUsesHelmValues: false
-        probeSelectorNilUsesHelmValues: false
         ruleSelectorNilUsesHelmValues: false
-        scrapeConfigSelectorNilUsesHelmValues: false
         storageSpec:
           volumeClaimTemplate:
             spec:
@@ -39,104 +42,45 @@ spec:
                 - ReadWriteOnce
               resources:
                 requests:
-                  storage: 50Gi
-        retention: 14d
-        retentionSize: 50GB
-        enableAdminAPI: true
-        walCompression: true
-        enableFeatures:
-          - memory-snapshot-on-shutdown
+                  storage: 20Gi
+        retention: 7d
+        replicas: 1
         resources:
           requests:
             cpu: 100m
-            memory: 2Gi
+            memory: 512Mi
           limits:
-            memory: 2000Mi
-        externalUrl: "https://prometheus.k8s.home.lab"
-        replicas: 1
-        securityContext:
-          fsGroup: 65535
-          runAsNonRoot: true
-          runAsUser: 65535
-          runAsGroup: 65535
+            memory: 1Gi
+
     grafana:
       enabled: true
-      forceDeployDashboards: true
-      defaultDashboardsEnabled: true
       persistence:
         enabled: true
         storageClassName: nfs-csi
-        size: 5Gi
-      datasources:
-        datasources.yaml:
-          apiVersion: 1
-          datasources:
-          - name: Prometheus
-            type: prometheus
-            url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
-            access: proxy
-            isDefault: true
+        size: 2Gi
+
     alertmanager:
-      enabled: true
-      alertmanagerSpec:
-        storage:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: nfs-csi
-              accessModes:
-                - ReadWriteOnce
-              resources:
-                requests:
-                  storage: 1Gi
-        replicas: 1
-        resources:
-          requests:
-            cpu: 10m
-            memory: 64Mi
+      enabled: false
+
     prometheus-node-exporter:
       enabled: true
-      fullnameOverride: node-exporter
-      prometheus:
-        monitor:
-          enabled: true
-          relabelings:
-            - targetLabel: kubernetes_node
-              sourceLabels:
-                - __meta_kubernetes_pod_node_name
-              action: replace
-              regex: (.*)
-              replacement: $1
+
     kube-state-metrics:
       enabled: true
-      fullnameOverride: kube-state-metrics
-      prometheus:
-        monitor:
-          enabled: true
-          relabelings:
-            - targetLabel: kubernetes_node
-              sourceLabels:
-                - __meta_kubernetes_pod_node_name
-              action: replace
-              regex: (.*)
-              replacement: $1
+
     kubeApiServer:
       enabled: true
-    kubeControllerManager:
-      enabled: true
-    kubeScheduler:
-      enabled: true
+
     kubelet:
       enabled: true
+
     coreDns:
       enabled: true
+
     defaultRules:
       create: true
-      rules:
-        general: true
-        kubelet: true
-        nodeExporterAlerting: true
-        nodeExporterRecording: true
       disabled:
         KubeControllerManagerDown: true
         KubeProxyDown: true
         KubeSchedulerDown: true
+        KubeSchedulerAlerting: true
