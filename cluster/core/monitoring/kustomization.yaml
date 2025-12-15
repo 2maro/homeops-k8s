@@ -2,5 +2,5 @@
   kind: Kustomization
   resources:
     - namespace.yaml
-    - healmrelease.yaml  
+    - helmrelease.yaml  
     - helmrepository.yaml

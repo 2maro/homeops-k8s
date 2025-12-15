@@ -16,12 +16,13 @@ spec:
   valuesFrom:
   - kind: Secret
     name: monitoring-secrets
+    valuesKey: admin_password
+    targetPath: grafana.adminPassword
   values:
     kubeProxy:
       enabled: false
     kubeEtcd:
       enabled: false
-    
     prometheus:
       enabled: true
       prometheusSpec:
@@ -30,7 +31,6 @@ spec:
         probeSelectorNilUsesHelmValues: false
         ruleSelectorNilUsesHelmValues: false
         scrapeConfigSelectorNilUsesHelmValues: false
-        
         storageSpec:
           volumeClaimTemplate:
             spec:
@@ -40,41 +40,33 @@ spec:
               resources:
                 requests:
                   storage: 50Gi
-        
         retention: 14d
         retentionSize: 50GB
         enableAdminAPI: true
         walCompression: true
         enableFeatures:
           - memory-snapshot-on-shutdown
-        
         resources:
           requests:
             cpu: 100m
             memory: 2Gi
           limits:
             memory: 2000Mi
-        
         externalUrl: "https://prometheus.k8s.home.lab"
         replicas: 1
-        
         securityContext:
           fsGroup: 65535
           runAsNonRoot: true
           runAsUser: 65535
           runAsGroup: 65535
-    
     grafana:
       enabled: true
-      adminPassword: changeme
       forceDeployDashboards: true
       defaultDashboardsEnabled: true
-      
       persistence:
         enabled: true
         storageClassName: nfs-csi
         size: 5Gi
-      
       datasources:
         datasources.yaml:
           apiVersion: 1
@@ -84,7 +76,6 @@ spec:
             url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
             access: proxy
             isDefault: true
-    
     alertmanager:
       enabled: true
       alertmanagerSpec:
@@ -102,7 +93,6 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
-    
     prometheus-node-exporter:
       enabled: true
       fullnameOverride: node-exporter
@@ -116,7 +106,6 @@ spec:
               action: replace
               regex: (.*)
               replacement: $1
-    
     kube-state-metrics:
       enabled: true
       fullnameOverride: kube-state-metrics
@@ -130,22 +119,16 @@ spec:
               action: replace
               regex: (.*)
               replacement: $1
-    
     kubeApiServer:
       enabled: true
-    
     kubeControllerManager:
       enabled: true
-    
     kubeScheduler:
       enabled: true
-    
     kubelet:
       enabled: true
-    
     coreDns:
       enabled: true
-    
     defaultRules:
       create: true
       rules:
