@@ -36,6 +36,7 @@ spec:
   values:
     authentik:
       log_level: info
+      host: https://auth.k8s.home.lab
       postgresql:
         host: authentik-postgres-rw.authentik.svc.cluster.local
         name: authentik

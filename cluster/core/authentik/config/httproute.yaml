@@ -16,4 +16,4 @@ spec:
         value: /
     backendRefs:
     - name: authentik
-      port: 80
+      port: 9000
