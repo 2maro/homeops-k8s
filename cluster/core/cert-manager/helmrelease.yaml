@@ -27,3 +27,6 @@ spec:
         global:
             leaderElection:
                 namespace: cert-manager
+        serviceAccount:
+            create: true
+            name: cert-manager
