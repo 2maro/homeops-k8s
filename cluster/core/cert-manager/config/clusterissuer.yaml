@@ -8,7 +8,7 @@ spec:
     path: pki_int/issue/k8s-cluster-role
     auth:
       kubernetes:
-        mountPath: auth/kubernetes
+        mountPath: kubernetes
         role: cert-manager-role
         serviceAccountRef:
           name: cert-manager
