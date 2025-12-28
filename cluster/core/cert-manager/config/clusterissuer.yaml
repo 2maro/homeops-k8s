@@ -5,7 +5,7 @@ metadata:
 spec:
   vault:
     server: http://192.168.1.48:8200
-    path: pki_int/issue/k8s-cluster-role
+    path: pki_int/sign/k8s-cluster-role
     auth:
       kubernetes:
         mountPath: /v1/auth/kubernetes
