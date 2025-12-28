@@ -13,7 +13,7 @@ metadata:
 spec:
   loadBalancerIPs: true
   interfaces:
-    - eth0
+    - ^eth0$
   nodeSelector:
     matchExpressions:
       - key: node-role.kubernetes.io/control-plane
