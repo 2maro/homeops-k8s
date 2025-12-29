@@ -1,0 +1,60 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+    name: firefly-config
+    namespace: flux-system
+spec:
+    dependsOn:
+        - name: authentik-config
+    path: ./cluster/apps/firefly/config
+    prune: true
+    interval: 5m
+    sourceRef:
+        kind: GitRepository
+        name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+    name: syncthing-config
+    namespace: flux-system
+spec:
+    dependsOn:
+        - name: authentik-config
+    path: ./cluster/apps/syncthing/config
+    prune: true
+    interval: 5m
+    sourceRef:
+        kind: GitRepository
+        name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+    name: jellyfin-config
+    namespace: flux-system
+spec:
+    dependsOn:
+        - name: authentik-config
+    path: ./cluster/apps/jellyfin/config
+    prune: true
+    interval: 5m
+    sourceRef:
+        kind: GitRepository
+        name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+    name: qbittorrent-config
+    namespace: flux-system
+spec:
+    dependsOn:
+        - name: authentik-config
+    path: ./cluster/apps/qbittorrent/config
+    prune: true
+    interval: 5m
+    sourceRef:
+        kind: GitRepository
+        name: flux-system
