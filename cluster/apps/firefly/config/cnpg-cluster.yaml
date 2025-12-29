@@ -1,0 +1,20 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+    name: firefly-postgres
+    namespace: firefly
+spec:
+    instances: 1
+    postgresql:
+        parameters:
+            shared_buffers: "256MB"
+    storage:
+        size: 10Gi
+        storageClass: nfs-csi
+    bootstrap:
+        initdb:
+            database: firefly
+            owner: firefly
+            secret:
+                name: firefly-postgres-credentials

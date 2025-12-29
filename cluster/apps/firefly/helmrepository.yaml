@@ -1,0 +1,106 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+    name: bjw-s
+    namespace: firefly
+spec:
+    interval: 1h
+    url: oci://ghcr.io/bjw-s-labs/helm
+    ref:
+        tag: app-template-4.5.0
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+    name: firefly
+    namespace: firefly
+spec:
+    interval: 30m
+    chart:
+        spec:
+            chart: app-template
+            version: "4.5.0"
+            sourceRef:
+                kind: OCIRepository
+                name: bjw-s
+                namespace: firefly
+    values:
+        defaultPodOptions:
+            automountServiceAccountToken: false
+            securityContext:
+                runAsUser: 33
+                runAsGroup: 33
+                runAsNonRoot: true
+                fsGroup: 33
+                fsGroupChangePolicy: OnRootMismatch
+        controllers:
+            main:
+                type: deployment
+                replicas: 1
+                annotations:
+                    reloader.stakater.com/auto: "true"
+                containers:
+                    main:
+                        image:
+                            repository: fireflyiii/core
+                            tag: version-6.1
+                        env:
+                            APP_ENV: production
+                            APP_DEBUG: "false"
+                            APP_LOG_LEVEL: info
+                            LOG_CHANNEL: stack
+                            DB_CONNECTION: pgsql
+                            DB_HOST: firefly-postgres-rw.firefly.svc.cluster.local
+                            DB_PORT: "5432"
+                            DB_DATABASE: firefly
+                            DB_USERNAME: firefly
+                            APP_URL: "https://firefly.k8s.home.lab"
+                            TRUSTED_PROXIES: "*"
+                            TZ: UTC
+                            AUTHENTICATION_GUARD: remote_user_guard
+                            AUTHENTICATION_GUARD_HEADER: HTTP_X_AUTHENTIK_USERNAME
+                            AUTHENTICATION_GUARD_EMAIL: HTTP_X_AUTHENTIK_EMAIL
+                        envFrom:
+                            - secretRef:
+                                  name: firefly-secrets
+                        resources:
+                            requests:
+                                cpu: 100m
+                                memory: 256Mi
+                            limits:
+                                cpu: 500m
+                                memory: 512Mi
+            redis:
+                type: deployment
+                replicas: 1
+                containers:
+                    main:
+                        image:
+                            repository: valkey/valkey
+                            tag: "7.2"
+                        resources:
+                            requests:
+                                cpu: 50m
+                                memory: 64Mi
+                            limits:
+                                cpu: 100m
+                                memory: 128Mi
+        service:
+            main:
+                controller: main
+                ports:
+                    http:
+                        port: 8080
+            redis:
+                controller: redis
+                ports:
+                    redis:
+                        port: 6379
+        persistence:
+            data:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: firefly-data
+                globalMounts:
+                    - path: /var/www/html/storage/upload
