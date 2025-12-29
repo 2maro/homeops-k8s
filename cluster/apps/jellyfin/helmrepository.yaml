@@ -1,0 +1,93 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+    name: bjw-s
+    namespace: jellyfin
+spec:
+    interval: 1h
+    url: oci://ghcr.io/bjw-s-labs/helm
+    ref:
+        tag: app-template-4.5.0
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+    name: jellyfin
+    namespace: jellyfin
+spec:
+    interval: 30m
+    chart:
+        spec:
+            chart: app-template
+            version: "4.5.0"
+            sourceRef:
+                kind: OCIRepository
+                name: bjw-s
+                namespace: jellyfin
+    values:
+        defaultPodOptions:
+            automountServiceAccountToken: false
+            securityContext:
+                runAsUser: 568
+                runAsGroup: 568
+                runAsNonRoot: true
+                fsGroup: 568
+                fsGroupChangePolicy: OnRootMismatch
+        controllers:
+            main:
+                type: deployment
+                replicas: 1
+                annotations:
+                    reloader.stakater.com/auto: "true"
+                containers:
+                    main:
+                        image:
+                            repository: jellyfin/jellyfin
+                            tag: "10.9.11"
+                        env:
+                            TZ: UTC
+                            PUID: "568"
+                            PGID: "568"
+                        resources:
+                            requests:
+                                cpu: 100m
+                                memory: 256Mi
+                            limits:
+                                cpu: 2000m
+                                memory: 2Gi
+        service:
+            main:
+                controller: main
+                ports:
+                    http:
+                        port: 8096
+        persistence:
+            config:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: jellyfin-config
+                globalMounts:
+                    - path: /config
+            media-nfs:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: jellyfin-media-nfs
+                globalMounts:
+                    - path: /media/nfs
+            media-smb:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: jellyfin-media-smb
+                globalMounts:
+                    - path: /media/smb
+            cache:
+                enabled: true
+                type: emptyDir
+                globalMounts:
+                    - path: /cache
+            tmp:
+                enabled: true
+                type: emptyDir
+                globalMounts:
+                    - path: /tmp
