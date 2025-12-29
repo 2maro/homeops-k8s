@@ -4,5 +4,5 @@ resources:
 - gotk-components.yaml
 - gotk-sync.yaml
 - cluster-config.yaml
-- app=config.yaml
+- app-config.yaml
 
