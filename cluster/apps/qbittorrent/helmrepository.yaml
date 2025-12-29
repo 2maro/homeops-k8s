@@ -1,14 +1,13 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: OCIRepository
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
 metadata:
     name: bjw-s
     namespace: qbittorrent
 spec:
     interval: 1h
     url: oci://ghcr.io/bjw-s-labs/helm
-    ref:
-        tag: app-template-4.5.0
+    type: oci
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -22,7 +21,7 @@ spec:
             chart: app-template
             version: "4.5.0"
             sourceRef:
-                kind: OCIRepository
+                kind: HelmRepository
                 name: bjw-s
                 namespace: qbittorrent
     values:
