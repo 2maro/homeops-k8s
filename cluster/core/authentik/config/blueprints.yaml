@@ -2,204 +2,187 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-    name: authentik-blueprints
-    namespace: authentik
+  name: authentik-blueprints
+  namespace: authentik
 data:
-    apps.yaml: |
-        version: 1
-        metadata:
-            name: All Apps
-            labels:
-                blueprints.goauthentik.io/instantiate: "true"
+  full-setup.yaml: |
+    version: 1
+    metadata:
+      name: Home Lab Infrastructure
+      labels:
+        blueprints.goauthentik.io/instantiate: "true"
+    entries:
+      # ---------------------------------------------------------
+      # 1. ADMIN USERS & GROUPS
+      # ---------------------------------------------------------
+      - model: authentik_core.user
+        id: admin-user
+        identifiers:
+          username: admin
+        attrs:
+          name: Admin
+          email: 2marotech@gmail.com
+          is_active: true
+          path: users
+          type: internal
 
-        entries:
-            # Grafana Provider
-            - model: authentik_providers_proxy.proxyprovider
-              id: grafana-provider
-              identifiers:
-                  name: Grafana
-              attrs:
-                  authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-                  mode: proxy
-                  external_host: https://grafana.k8s.home.lab
-                  internal_host: http://kube-prometheus-stack-grafana.monitoring.svc.cluster.local:80
+      - model: authentik_core.group
+        identifiers:
+          name: Admins
+        attrs:
+          is_superuser: true
+          users:
+            - !KeyOf admin-user
 
-            - model: authentik_core.application
-              identifiers:
-                  slug: grafana
-              attrs:
-                  name: Grafana
-                  policy_engine_mode: any
-                  provider: !KeyOf grafana-provider
-                  meta_launch_url: https://grafana.k8s.home.lab
+      # ---------------------------------------------------------
+      # 2. PROXY PROVIDERS
+      # ---------------------------------------------------------
+      # We define these first so we can reference them later
+      - model: authentik_providers_proxy.proxyprovider
+        id: prov-grafana
+        identifiers:
+          name: Grafana
+        attrs:
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          mode: proxy
+          external_host: https://grafana.k8s.home.lab
+          internal_host: http://kube-prometheus-stack-grafana.monitoring.svc.cluster.local:80
 
-            # Prometheus Provider
-            - model: authentik_providers_proxy.proxyprovider
-              id: prometheus-provider
-              identifiers:
-                  name: Prometheus
-              attrs:
-                  authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-                  mode: proxy
-                  external_host: https://prometheus.k8s.home.lab
-                  internal_host: http://prometheus-kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+      - model: authentik_providers_proxy.proxyprovider
+        id: prov-prometheus
+        identifiers:
+          name: Prometheus
+        attrs:
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          mode: proxy
+          external_host: https://prometheus.k8s.home.lab
+          internal_host: http://prometheus-kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
 
-            - model: authentik_core.application
-              identifiers:
-                  slug: prometheus
-              attrs:
-                  name: Prometheus
-                  policy_engine_mode: any
-                  provider: !KeyOf prometheus-provider
-                  meta_launch_url: https://prometheus.k8s.home.lab
+      - model: authentik_providers_proxy.proxyprovider
+        id: prov-alertmanager
+        identifiers:
+          name: Alertmanager
+        attrs:
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          mode: proxy
+          external_host: https://alertmanager.k8s.home.lab
+          internal_host: http://alertmanager-kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
 
-            # Alertmanager Provider
-            - model: authentik_providers_proxy.proxyprovider
-              id: alertmanager-provider
-              identifiers:
-                  name: Alertmanager
-              attrs:
-                  authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-                  mode: proxy
-                  external_host: https://alertmanager.k8s.home.lab
-                  internal_host: http://alertmanager-kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
+      - model: authentik_providers_proxy.proxyprovider
+        id: prov-firefly
+        identifiers:
+          name: Firefly III
+        attrs:
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          mode: proxy
+          external_host: https://firefly.k8s.home.lab
+          internal_host: http://firefly-main.firefly.svc.cluster.local:8080
 
-            - model: authentik_core.application
-              identifiers:
-                  slug: alertmanager
-              attrs:
-                  name: Alertmanager
-                  policy_engine_mode: any
-                  provider: !KeyOf alertmanager-provider
-                  meta_launch_url: https://alertmanager.k8s.home.lab
+      - model: authentik_providers_proxy.proxyprovider
+        id: prov-syncthing
+        identifiers:
+          name: Syncthing
+        attrs:
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          mode: proxy
+          external_host: https://syncthing.k8s.home.lab
+          internal_host: http://syncthing-app.syncthing.svc.cluster.local:8384
 
-            # Firefly Provider
-            - model: authentik_providers_proxy.proxyprovider
-              id: firefly-provider
-              identifiers:
-                  name: Firefly III
-              attrs:
-                  authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-                  mode: proxy
-                  external_host: https://firefly.k8s.home.lab
-                  internal_host: http://firefly-main.firefly.svc.cluster.local:8080
+      - model: authentik_providers_proxy.proxyprovider
+        id: prov-jellyfin
+        identifiers:
+          name: Jellyfin
+        attrs:
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          mode: proxy
+          external_host: https://jellyfin.k8s.home.lab
+          internal_host: http://jellyfin.jellyfin.svc.cluster.local:8096
 
-            - model: authentik_core.application
-              identifiers:
-                  slug: firefly
-              attrs:
-                  name: Firefly III
-                  policy_engine_mode: any
-                  provider: !KeyOf firefly-provider
-                  meta_launch_url: https://firefly.k8s.home.lab
+      - model: authentik_providers_proxy.proxyprovider
+        id: prov-qbittorrent
+        identifiers:
+          name: qBittorrent
+        attrs:
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          mode: proxy
+          external_host: https://qbittorrent.k8s.home.lab
+          internal_host: http://qbittorrent-main.qbittorrent.svc.cluster.local:8080
 
-            # Syncthing Provider
-            - model: authentik_providers_proxy.proxyprovider
-              id: syncthing-provider
-              identifiers:
-                  name: Syncthing
-              attrs:
-                  authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-                  mode: proxy
-                  external_host: https://syncthing.k8s.home.lab
-                  internal_host: http://syncthing-app.syncthing.svc.cluster.local:8384
+      # ---------------------------------------------------------
+      # 3. APPLICATIONS
+      # ---------------------------------------------------------
+      - model: authentik_core.application
+        identifiers:
+          slug: grafana
+        attrs:
+          name: Grafana
+          provider: !KeyOf prov-grafana
+          meta_launch_url: https://grafana.k8s.home.lab
 
-            - model: authentik_core.application
-              identifiers:
-                  slug: syncthing
-              attrs:
-                  name: Syncthing
-                  policy_engine_mode: any
-                  provider: !KeyOf syncthing-provider
-                  meta_launch_url: https://syncthing.k8s.home.lab
+      - model: authentik_core.application
+        identifiers:
+          slug: prometheus
+        attrs:
+          name: Prometheus
+          provider: !KeyOf prov-prometheus
+          meta_launch_url: https://prometheus.k8s.home.lab
 
-            # Jellyfin Provider
-            - model: authentik_providers_proxy.proxyprovider
-              id: jellyfin-provider
-              identifiers:
-                  name: Jellyfin
-              attrs:
-                  authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-                  mode: proxy
-                  external_host: https://jellyfin.k8s.home.lab
-                  internal_host: http://jellyfin.jellyfin.svc.cluster.local:8096
+      - model: authentik_core.application
+        identifiers:
+          slug: alertmanager
+        attrs:
+          name: Alertmanager
+          provider: !KeyOf prov-alertmanager
+          meta_launch_url: https://alertmanager.k8s.home.lab
 
-            - model: authentik_core.application
-              identifiers:
-                  slug: jellyfin
-              attrs:
-                  name: Jellyfin
-                  policy_engine_mode: any
-                  provider: !KeyOf jellyfin-provider
-                  meta_launch_url: https://jellyfin.k8s.home.lab
+      - model: authentik_core.application
+        identifiers:
+          slug: firefly
+        attrs:
+          name: Firefly III
+          provider: !KeyOf prov-firefly
+          meta_launch_url: https://firefly.k8s.home.lab
 
-            # qBittorrent Provider
-            - model: authentik_providers_proxy.proxyprovider
-              id: qbittorrent-provider
-              identifiers:
-                  name: qBittorrent
-              attrs:
-                  authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-                  mode: proxy
-                  external_host: https://qbittorrent.k8s.home.lab
-                  internal_host: http://qbittorrent-main.qbittorrent.svc.cluster.local:8080
+      - model: authentik_core.application
+        identifiers:
+          slug: syncthing
+        attrs:
+          name: Syncthing
+          provider: !KeyOf prov-syncthing
+          meta_launch_url: https://syncthing.k8s.home.lab
 
-            - model: authentik_core.application
-              identifiers:
-                  slug: qbittorrent
-              attrs:
-                  name: qBittorrent
-                  policy_engine_mode: any
-                  provider: !KeyOf qbittorrent-provider
-                  meta_launch_url: https://qbittorrent.k8s.home.lab
+      - model: authentik_core.application
+        identifiers:
+          slug: jellyfin
+        attrs:
+          name: Jellyfin
+          provider: !KeyOf prov-jellyfin
+          meta_launch_url: https://jellyfin.k8s.home.lab
 
-    outpost.yaml: |
-        version: 1
-        metadata:
-            name: Embedded Outpost Config
-            labels:
-                blueprints.goauthentik.io/instantiate: "true"
+      - model: authentik_core.application
+        identifiers:
+          slug: qbittorrent
+        attrs:
+          name: qBittorrent
+          provider: !KeyOf prov-qbittorrent
+          meta_launch_url: https://qbittorrent.k8s.home.lab
 
-        entries:
-            - model: authentik_outposts.outpost
-              identifiers:
-                  name: authentik Embedded Outpost
-              attrs:
-                  type: proxy
-                  providers:
-                      - !Find [authentik_providers_proxy.proxyprovider, [name, Grafana]]
-                      - !Find [authentik_providers_proxy.proxyprovider, [name, Prometheus]]
-                      - !Find [authentik_providers_proxy.proxyprovider, [name, Alertmanager]]
-                      - !Find [authentik_providers_proxy.proxyprovider, [name, Firefly III]]
-                      - !Find [authentik_providers_proxy.proxyprovider, [name, Syncthing]]
-                      - !Find [authentik_providers_proxy.proxyprovider, [name, Jellyfin]]
-                      - !Find [authentik_providers_proxy.proxyprovider, [name, qBittorrent]]
-                  config:
-                      authentik_host: https://auth.k8s.home.lab
-
-    users.yaml: |
-        version: 1
-        metadata:
-            name: Admin User
-            labels:
-                blueprints.goauthentik.io/instantiate: "true"
-
-        entries:
-            - model: authentik_core.user
-              id: admin-user
-              identifiers:
-                  username: admin
-              attrs:
-                  name: Admin
-                  email: 2marotech@gmail.com
-                  is_active: true
-                  path: users
-                  type: internal
-
-            - model: authentik_core.group
-              identifiers:
-                  name: Admins
-              attrs:
-                  is_superuser: true
-                  users:
-                      - !KeyOf admin-user
+      # ---------------------------------------------------------
+      # 4. OUTPOST CONFIGURATION
+      # ---------------------------------------------------------
+      - model: authentik_outposts.outpost
+        identifiers:
+          name: authentik Embedded Outpost
+        attrs:
+          type: proxy
+          # Use !KeyOf to ensure they link to the providers created above
+          providers:
+            - !KeyOf prov-grafana
+            - !KeyOf prov-prometheus
+            - !KeyOf prov-alertmanager
+            - !KeyOf prov-firefly
+            - !KeyOf prov-syncthing
+            - !KeyOf prov-jellyfin
+            - !KeyOf prov-qbittorrent
+          config:
+            authentik_host: https://auth.k8s.home.lab
