@@ -18,7 +18,7 @@ spec:
                     type: PathPrefix
                     value: /
           backendRefs:
-              - name: ak-outpost-proxy-outpost
+              - name: ak-outpost-authentik-embedded-outpost
                 port: 9000
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -40,7 +40,7 @@ spec:
                     type: PathPrefix
                     value: /
           backendRefs:
-              - name: ak-outpost-proxy-outpost
+              - name: ak-outpost-authentik-embedded-outpost
                 port: 9000
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -62,7 +62,7 @@ spec:
                     type: PathPrefix
                     value: /
           backendRefs:
-              - name: ak-outpost-proxy-outpost
+              - name: ak-outpost-authentik-embedded-outpost
                 port: 9000
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -84,7 +84,7 @@ spec:
                     type: PathPrefix
                     value: /
           backendRefs:
-              - name: ak-outpost-proxy-outpost
+              - name: ak-outpost-authentik-embedded-outpost
                 port: 9000
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -106,7 +106,7 @@ spec:
                     type: PathPrefix
                     value: /
           backendRefs:
-              - name: ak-outpost-proxy-outpost
+              - name: ak-outpost-authentik-embedded-outpost
                 port: 9000
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -128,7 +128,7 @@ spec:
                     type: PathPrefix
                     value: /
           backendRefs:
-              - name: ak-outpost-proxy-outpost
+              - name: ak-outpost-authentik-embedded-outpost
                 port: 9000
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -150,7 +150,7 @@ spec:
                     type: PathPrefix
                     value: /
           backendRefs:
-              - name: ak-outpost-proxy-outpost
+              - name: ak-outpost-authentik-embedded-outpost
                 port: 9000
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -172,5 +172,5 @@ spec:
                     type: PathPrefix
                     value: /
           backendRefs:
-              - name: ak-outpost-proxy-outpost
+              - name: ak-outpost-authentik-embedded-outpost
                 port: 9000
