@@ -37,76 +37,82 @@ data:
       # ---------------------------------------------------------
       # 2. PROXY PROVIDERS
       # ---------------------------------------------------------
-      # We define these first so we can reference them later
       - model: authentik_providers_proxy.proxyprovider
         id: prov-grafana
         identifiers:
           name: Grafana
         attrs:
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           mode: proxy
           external_host: https://grafana.k8s.home.lab
           internal_host: http://kube-prometheus-stack-grafana.monitoring.svc.cluster.local:80
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         id: prov-prometheus
         identifiers:
           name: Prometheus
         attrs:
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           mode: proxy
           external_host: https://prometheus.k8s.home.lab
           internal_host: http://prometheus-kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         id: prov-alertmanager
         identifiers:
           name: Alertmanager
         attrs:
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           mode: proxy
           external_host: https://alertmanager.k8s.home.lab
           internal_host: http://alertmanager-kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         id: prov-firefly
         identifiers:
           name: Firefly III
         attrs:
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           mode: proxy
           external_host: https://firefly.k8s.home.lab
           internal_host: http://firefly-main.firefly.svc.cluster.local:8080
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         id: prov-syncthing
         identifiers:
           name: Syncthing
         attrs:
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           mode: proxy
           external_host: https://syncthing.k8s.home.lab
           internal_host: http://syncthing-app.syncthing.svc.cluster.local:8384
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         id: prov-jellyfin
         identifiers:
           name: Jellyfin
         attrs:
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           mode: proxy
           external_host: https://jellyfin.k8s.home.lab
           internal_host: http://jellyfin.jellyfin.svc.cluster.local:8096
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         id: prov-qbittorrent
         identifiers:
           name: qBittorrent
         attrs:
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           mode: proxy
           external_host: https://qbittorrent.k8s.home.lab
           internal_host: http://qbittorrent-main.qbittorrent.svc.cluster.local:8080
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
 
       # ---------------------------------------------------------
       # 3. APPLICATIONS
@@ -175,7 +181,6 @@ data:
           name: authentik Embedded Outpost
         attrs:
           type: proxy
-          # Use !KeyOf to ensure they link to the providers created above
           providers:
             - !KeyOf prov-grafana
             - !KeyOf prov-prometheus
